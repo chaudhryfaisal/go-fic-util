@@ -1,4 +1,4 @@
-package main
+package com
 
 import (
 	"github.com/chaudhryfaisal/elogrus"

@@ -1,6 +1,7 @@
-package main
+package http
 
 import (
+	. "chaudhryfaisal/go-fic-util/com"
 	"crypto/tls"
 	"fmt"
 	"io"
