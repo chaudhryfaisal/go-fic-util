@@ -1,4 +1,4 @@
-module chaudhryfaisal/go-fic-util
+module github.com/chaudhryfaisal/go-fic-util
 
 go 1.15
 
