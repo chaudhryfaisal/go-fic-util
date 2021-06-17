@@ -1,7 +1,7 @@
 package http
 
 import (
-	. "chaudhryfaisal/go-fic-util/com"
+	. "github.com/chaudhryfaisal/go-fic-util/com"
 	"crypto/tls"
 	"fmt"
 	"io"
