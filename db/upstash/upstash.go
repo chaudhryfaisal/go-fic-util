@@ -8,7 +8,7 @@ import (
 )
 
 var Endpoint = PropS("DB_UP_STASH_ENDPOINT", EndpointHttpDebug)
-var Token = PropS("DB_UP_STASH_TOKEN", "DB_UPSTASH_TOKEN")
+var Token = PropS("DB_UP_STASH_TOKEN", "DB_UP_STASH_TOKEN")
 
 func Get(key string) string {
 	endpoint := fmt.Sprintf("%s/get/%s?_token=%s", Endpoint, key, Token)

@@ -69,7 +69,7 @@ func HTTPRequest(r *Req) Resp {
 				ret.Body = r.Type
 				err = json.Unmarshal(respBytes, &ret.Body)
 				if err != nil {
-					Log.Errorf("Error parsing payload endpoint=%s error=%v payload=%s", r.Endpoint, err, string(respBytes))
+					Log.Errorf("Error decoding json payload endpoint=%s error=%v payload=%s", r.Endpoint, err, string(respBytes))
 					ret.Err = err
 				}
 			}
