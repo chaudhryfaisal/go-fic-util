@@ -18,13 +18,16 @@ var HTTPTimeout = 30 * time.Second
 var HTTPClient = HTTPBuildClient(PropS("PROXY", ""))
 
 type Req struct {
-	Endpoint    string
-	Method      string
-	Payload     []byte
-	Headers     map[string]string
-	ContentType string
-	Type        interface{}
-	HTTPClient  *http.Client
+	Endpoint                   string
+	Method                     string
+	Payload                    []byte
+	Headers                    map[string]string
+	ContentType                string
+	Type                       interface{}
+	HTTPClient                 *http.Client
+	Request                    *http.Request
+	KeepAcceptEncodingHeader   bool
+	KeepDefaultHeadersToRemove bool
 }
 type Resp struct {
 	Status  int
@@ -35,20 +38,46 @@ type Resp struct {
 
 func HTTPRequest(r *Req) Resp {
 	method := r.Method
+	var payload []byte = nil
+	if r.Payload != nil {
+		payload = r.Payload
+	} else if r.Request != nil {
+		payload, _ = ioutil.ReadAll(r.Request.Body)
+	}
 	if method == "" {
 		method = "GET"
+		if r.Request != nil {
+			method = r.Request.Method
+		} else if payload != nil {
+			method = "POST"
+		}
 	}
-	req, err := http.NewRequest(method, r.Endpoint, bytes.NewBuffer(r.Payload))
+
+	req, err := http.NewRequest(method, r.Endpoint, bytes.NewBuffer(payload))
 	if err != nil {
 		Log.Errorf("Error creating request error=%v", err)
 		return Resp{Err: err}
 	}
 
+	if r.Request != nil {
+		for k, _ := range r.Request.Header {
+			req.Header.Set(k, r.Request.Header.Get(k))
+		}
+	}
 	for k, v := range r.Headers {
 		req.Header.Set(k, v)
 	}
+
 	if r.ContentType != "" {
-		req.Header.Set("content-type", r.ContentType)
+		req.Header.Set("Content-Type", r.ContentType)
+	}
+	if !r.KeepAcceptEncodingHeader {
+		req.Header.Del("Accept-Encoding")
+	}
+	if !r.KeepAcceptEncodingHeader {
+		for _, h := range HeadersToDelete {
+			req.Header.Del(h)
+		}
 	}
 	resp, err := HTTPClient.Do(req)
 	if err != nil {

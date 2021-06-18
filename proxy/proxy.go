@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-var HeadersToDelete = []string{KeyHttpPr0xyHeaderEndpoint, "Accept-Encoding", "Host", "Referer", "Origin", "Cdn-Loop", "Cf-Connecting-Ip", "Cf-Ipcountry", "Cf-Ray", "Cf-Request-Id", "Cf-Visitor", "Connection", "X-Forwarded-For", "X-Forwarded-Host", "X-Forwarded-Proto", "X-Real-Ip"}
 var RegexUrl = regexp.MustCompile(`(https?)://([\w.-]+):?(\d+)?([/.a-zA-Z0-9?=&_~:#\[\]@!$'()*+;%{}-]+)?`)
 
 func HTTPRespondJson(rw http.ResponseWriter, json string) {
@@ -23,19 +22,19 @@ func HTTPRespondJsonWithStatus(rw http.ResponseWriter, json string, status int) 
 }
 func HTTPProxyPass(rw http.ResponseWriter, r *http.Request, endpoint string) {
 	req, err := http.NewRequest(r.Method, endpoint, r.Body)
-	HTTPCopyHeadersForProxy(r, req)
+	HTTPCopyHeadersForUpstream(r, req)
 	resp, err := HTTPClient.Do(req)
 	if err != nil {
 		HTTPError(err, rw, "HTTPProxyPass", "HTTPError proxying to upstream", "endpoint="+endpoint)
 	} else {
 		rw.WriteHeader(resp.StatusCode)
-		HTTPCopyHeadersForClientResponse(resp, rw)
+		HTTPCopyHeadersForClient(resp, rw)
 		_, _ = io.Copy(rw, resp.Body)
 		_ = resp.Body.Close()
 	}
 }
 
-func HTTPCopyHeadersForClientResponse(src *http.Response, dest http.ResponseWriter) {
+func HTTPCopyHeadersForClient(src *http.Response, dest http.ResponseWriter) {
 	for name, values := range src.Header {
 		for _, value := range values {
 			if strings.ToLower(name) != "content-length" {
@@ -44,8 +43,17 @@ func HTTPCopyHeadersForClientResponse(src *http.Response, dest http.ResponseWrit
 		}
 	}
 }
+func HTTPCopyHeadersForClientFromResp(src *Resp, dest http.ResponseWriter) {
+	for name, values := range src.Headers {
+		for _, value := range values {
+			if strings.ToLower(name) != "content-length" {
+				dest.Header().Set(name, value)
+			}
+		}
+	}
+}
 
-func HTTPCopyHeadersForProxy(src *http.Request, dest *http.Request) {
+func HTTPCopyHeadersForUpstream(src *http.Request, dest *http.Request) {
 	for name, values := range src.Header {
 		for _, value := range values {
 			dest.Header.Set(name, value)

@@ -33,14 +33,14 @@ func Pr0xyWithReplaceInBody(rw http.ResponseWriter, r *http.Request, include *re
 	endpoint := r.Header.Get(KeyHttpPr0xyHeaderEndpoint)
 	r.Header.Del(KeyHttpPr0xyHeaderEndpoint)
 	req, err := http.NewRequest(r.Method, endpoint, r.Body)
-	HTTPCopyHeadersForProxy(r, req)
+	HTTPCopyHeadersForUpstream(r, req)
 	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
 		HTTPError(err, rw, "Pr0xyWithReplaceInBody", "HTTPError proxying to upstream", "endpoint="+endpoint)
 		return
 	}
 	rw.WriteHeader(resp.StatusCode)
-	HTTPCopyHeadersForClientResponse(resp, rw)
+	HTTPCopyHeadersForClient(resp, rw)
 	respBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		HTTPError(err, rw, "Pr0xyWithReplaceInBody", "error parsing payload from upstream", "respBytes="+string(respBytes))
