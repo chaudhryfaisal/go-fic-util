@@ -15,7 +15,7 @@ import (
 const byteArrayStr = "[]uint8"
 
 var HTTPTimeout = 30 * time.Second
-var HTTPClient = BuildHTTPClient(PropS("PROXY", ""))
+var HTTPClient = HTTPBuildClient(PropS("PROXY", ""))
 
 type Req struct {
 	Endpoint    string
@@ -80,7 +80,7 @@ func HTTPRequest(r *Req) Resp {
 	return ret
 }
 
-func BuildHTTPClient(proxy string) *http.Client {
+func HTTPBuildClient(proxy string) *http.Client {
 	transport := &http.Transport{}
 	if proxy != "" {
 		proxyURL, err := url.Parse(proxy)

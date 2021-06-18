@@ -16,10 +16,10 @@ var RegexPr0xy = regexp.MustCompile(`/PR0XY/(https?)/([\w-_.]+)/(\d+)?([\w+&@#/%
 type Pr0xyHandler func(rw http.ResponseWriter, r *http.Request, endpoint string)
 
 func Pr0xy(rw http.ResponseWriter, r *http.Request, handler Pr0xyHandler) {
-	path := RequestPathWithQuery(r)
+	path := HTTPRequestPathWithQuery(r)
 	server := RegexPr0xy.FindStringSubmatch(path)
 	if server == nil {
-		Error(nil, rw, "Pr0xy", "Invalid Request", fmt.Sprintf(`failed to match %s to %s`, path, RegexPr0xy.String()))
+		HTTPError(nil, rw, "Pr0xy", "Invalid Request", fmt.Sprintf(`failed to match %s to %s`, path, RegexPr0xy.String()))
 		return
 	}
 	endpoint := fmt.Sprintf("%s://%s:%s%s", server[1], server[2], server[3], server[4])
@@ -36,14 +36,14 @@ func Pr0xyWithReplaceInBody(rw http.ResponseWriter, r *http.Request, include *re
 	HTTPCopyHeadersForProxy(r, req)
 	resp, err := client.HTTPClient.Do(req)
 	if err != nil {
-		Error(err, rw, "Pr0xyWithReplaceInBody", "Error proxying to upstream", "endpoint="+endpoint)
+		HTTPError(err, rw, "Pr0xyWithReplaceInBody", "HTTPError proxying to upstream", "endpoint="+endpoint)
 		return
 	}
 	rw.WriteHeader(resp.StatusCode)
 	HTTPCopyHeadersForClientResponse(resp, rw)
 	respBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		Error(err, rw, "Pr0xyWithReplaceInBody", "error parsing payload from upstream", "respBytes="+string(respBytes))
+		HTTPError(err, rw, "Pr0xyWithReplaceInBody", "error parsing payload from upstream", "respBytes="+string(respBytes))
 		return
 	}
 	_, _ = rw.Write([]byte(Pr0xifyURLsInDataWithFilters(EndpointSelf, string(respBytes), include, exclude)))

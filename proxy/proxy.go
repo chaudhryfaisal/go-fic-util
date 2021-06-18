@@ -26,7 +26,7 @@ func HTTPProxyPass(rw http.ResponseWriter, r *http.Request, endpoint string) {
 	HTTPCopyHeadersForProxy(r, req)
 	resp, err := HTTPClient.Do(req)
 	if err != nil {
-		Error(err, rw, "HTTPProxyPass", "Error proxying to upstream", "endpoint="+endpoint)
+		HTTPError(err, rw, "HTTPProxyPass", "HTTPError proxying to upstream", "endpoint="+endpoint)
 	} else {
 		rw.WriteHeader(resp.StatusCode)
 		HTTPCopyHeadersForClientResponse(resp, rw)
@@ -56,12 +56,12 @@ func HTTPCopyHeadersForProxy(src *http.Request, dest *http.Request) {
 	}
 }
 
-func Error(err error, rw http.ResponseWriter, source, msg, details string) {
+func HTTPError(err error, rw http.ResponseWriter, source, msg, details string) {
 	Log.Errorf("%s: msg=%s details=%s error=%v", source, msg, details, err)
 	http.Error(rw, fmt.Sprintf("{\"error:\":\"%s\"}", msg), http.StatusBadRequest)
 }
 
-func RequestPathWithQuery(r *http.Request) string {
+func HTTPRequestPathWithQuery(r *http.Request) string {
 	path := r.RequestURI
 	if len(path) == 0 {
 		path = r.URL.Path

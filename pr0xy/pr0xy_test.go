@@ -42,7 +42,7 @@ func testPr0xyPath(t *testing.T, path string) {
 
 	respBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		t.Fatal("Error reading response body ", err)
+		t.Fatal("HTTPError reading response body ", err)
 		return
 	}
 	body := string(respBytes)
