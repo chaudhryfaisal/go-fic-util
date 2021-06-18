@@ -13,6 +13,7 @@ import (
 )
 
 const byteArrayStr = "[]uint8"
+
 var HTTPTimeout = 30 * time.Second
 var HTTPClient = BuildHTTPClient(PropS("PROXY", ""))
 
@@ -65,9 +66,7 @@ func HTTPRequest(r *Req) Resp {
 			if byteArrayStr == t.String() {
 				ret.Body = respBytes
 			} else {
-				v := reflect.New(t)
-				// reflected pointer
-				ret.Body = v.Interface()
+				ret.Body = r.Type
 				err = json.Unmarshal(respBytes, &ret.Body)
 				if err != nil {
 					Log.Errorf("Error parsing payload endpoint=%s error=%v payload=%s", r.Endpoint, err, string(respBytes))

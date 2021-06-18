@@ -2,7 +2,6 @@ package client
 
 import (
 	"errors"
-	"fmt"
 	"github.com/chaudhryfaisal/go-fic-util/util"
 	"github.com/stretchr/testify/assert"
 	"reflect"
@@ -29,11 +28,10 @@ func TestHTTPRequest(t *testing.T) {
 		{"GET Headers", args{&Req{Endpoint: util.EndpointHttpDebug, Headers: map[string]string{"HAPPY": "VERY"}}}, Resp{}, []string{"Happy: VERY", "GET / HTTP/1.1"}},
 		{"POST Headers", args{&Req{Endpoint: util.EndpointHttpDebug, Method: "POST", Headers: map[string]string{"HAPPY": "VERY"}}}, Resp{}, []string{"Happy: VERY", "POST / HTTP/1.1"}},
 		{"Content Type", args{&Req{Endpoint: util.EndpointHttpDebug, ContentType: "HAPPY_TYPE"}}, Resp{}, []string{"Content-Type: HAPPY_TYPE"}},
-		{"Map to Type", args{&Req{Endpoint: EndpointTodoGet, Type: Todo{}}}, Resp{Body: &Todo{1, 1, "delectus aut autem", false}}, nil},
-		{"Map to Type Error", args{&Req{Endpoint: util.EndpointHttpDebug, Type: Todo{}}}, Resp{Err: errors.New("invalid character 'G' looking for beginning of value")}, nil},
+		{"Map to Type", args{&Req{Endpoint: EndpointTodoGet, Type: &Todo{}}}, Resp{Body: &Todo{1, 1, "delectus aut autem", false}}, nil},
+		{"Map to Type Error", args{&Req{Endpoint: util.EndpointHttpDebug, Type: &Todo{}}}, Resp{Err: errors.New("invalid character 'G' looking for beginning of value")}, nil},
 		{"GET Request []byte{} ", args{&Req{Endpoint: util.EndpointHttpDebug, Type: []byte{}}}, Resp{Status: 200, Body: []byte{}}, nil},
-		{"Error Timeout", args{&Req{Endpoint: EndpointHTTPStatTimeout}}, Resp{Err: errors.New(fmt.Sprintf(`Get "%s": context deadline exceeded (Client.Timeout exceeded while awaiting headers)`, EndpointHTTPStatTimeout))}, nil},
-		{"Content Type", args{&Req{Endpoint: "https://httpstat.us/205", ContentType: "HAPPY_TYPE"}}, Resp{}, []string{"Content-Type: HAPPY_TYPE"}},
+		//{"Error Timeout", args{&Req{Endpoint: EndpointHTTPStatTimeout}}, Resp{Err: errors.New(fmt.Sprintf(`Get "%s": context deadline exceeded (Client.Timeout exceeded while awaiting headers)`, EndpointHTTPStatTimeout))}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
