@@ -1,9 +1,10 @@
-package com
+package util
 
 import (
 	"encoding/json"
 	"os"
 )
+
 
 func PropS(key string, def string) string {
 	val, _ := os.LookupEnv(key)

@@ -1,4 +1,4 @@
-package com
+package util
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestPropS(t *testing.T) {
-	os.Setenv("KEY_1", "VAL_1")
+	_ = os.Setenv("KEY_1", "VAL_1")
 	type args struct {
 		key string
 		def string

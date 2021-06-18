@@ -1,4 +1,4 @@
-package com
+package util
 
 import (
 	"github.com/chaudhryfaisal/elogrus"
@@ -16,7 +16,7 @@ func SetupLog() {
 	if len(LogEsToken) > 0 {
 		LogEsUrl := PropS("LOG_ES_URL", "https://cloud.humio.com:443/api/v1/ingest/elastic-bulk")
 		LogEsUser := PropS("LOG_ES_USER", "LOG_ES_USER")
-		LogEsHost := PropS("LOG_ES_HOST", "hotstar-proxy")
+		LogEsHost := PropS("LOG_ES_HOST", "LOG_ES_HOST")
 		client, err := elastic.NewClient(
 			elastic.SetURL(LogEsUrl),
 			elastic.SetBasicAuth(LogEsUser, LogEsToken),
