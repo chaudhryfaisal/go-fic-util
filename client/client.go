@@ -41,7 +41,7 @@ func HTTPRequest(r *Req) Resp {
 	var payload []byte = nil
 	if r.Payload != nil {
 		payload = r.Payload
-	} else if r.Request != nil {
+	} else if r.Request != nil && r.Request.Body != nil {
 		payload, _ = ioutil.ReadAll(r.Request.Body)
 	}
 	if method == "" {
